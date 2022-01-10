@@ -1,0 +1,109 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  epam-sam-java-example-2022
+
+  State Machine to download Notice documents from EurLex
+
+Resources:
+  ApplicationRestApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      Name: EurlexApplicationRestApi
+      StageName: prod
+
+  EurlexLoadNoticesStateMachine:
+    Type: AWS::Serverless::StateMachine
+    Properties:
+      DefinitionUri: statemachine/eurlex_notice.asl.json
+      DefinitionSubstitutions:
+        IngestAlerterArn: !GetAtt IngestAlerter.Arn
+        IngestAlertFilterArn: !GetAtt IngestAlertFilter.Arn
+        IngestMetadataDownloaderArn: !GetAtt IngestMetadataDownloader.Arn
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: post
+            Path: /starter
+            RestApiId: !Ref ApplicationRestApi
+      Policies:
+        - LambdaInvokePolicy:
+            FunctionName: !Ref IngestAlerter
+        - LambdaInvokePolicy:
+            FunctionName: !Ref IngestAlertFilter
+        - LambdaInvokePolicy:
+            FunctionName: !Ref IngestMetadataDownloader
+
+  EurlexDocumentsTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: eurlex_documents
+      BillingMode: PROVISIONED
+      ProvisionedThroughput:
+        ReadCapacityUnits: 5
+        WriteCapacityUnits: 5
+      KeySchema:
+        - AttributeName: cellarId
+          KeyType: HASH
+      AttributeDefinitions:
+        - AttributeName: cellarId
+          AttributeType: S
+
+  NoticesS3Bucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    Properties:
+      BucketName: abarmins3bucket
+
+  IngestAlerter:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/ingest-alerter/
+      Handler: dev.abarmin.lambda.ingest.alerter.IngestAlerterHandler::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
+
+  IngestAlertFilter:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/ingest_alert_filter/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          INGEST_DYNAMODB_TABLE_NAME: !Ref EurlexDocumentsTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref EurlexDocumentsTable
+    DependsOn:
+      - EurlexDocumentsTable
+
+  IngestMetadataDownloader:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: functions/ingest_metadata_downloader/
+      Handler: app.lambda_handler
+      Runtime: python3.8
+      Environment:
+        Variables:
+          INGEST_DYNAMODB_TABLE_NAME: !Ref EurlexDocumentsTable
+          INGEST_S3_BUCKET_NAME: !Ref NoticesS3Bucket
+      Timeout: 30
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref EurlexDocumentsTable
+        - DynamoDBWritePolicy:
+            TableName: !Ref EurlexDocumentsTable
+        - S3CrudPolicy:
+            BucketName: !Ref NoticesS3Bucket
+    DependsOn:
+      - EurlexDocumentsTable
+      - NoticesS3Bucket
+
+Outputs:
+  EurlexLoadNoticesStarter:
+    Description: "URL to kick-off the state machine, send a POST request here"
+    Value: !Sub "https://${ApplicationRestApi}.execute-api.${AWS::Region}.amazonaws.com/prod/starter"
