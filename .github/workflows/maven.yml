@@ -32,7 +32,7 @@ jobs:
         distribution: 'adopt'
         cache: maven
         
-    - name: Builder Functions
+    - name: Build Functions
       run: |
         cd functions/${{ matrix.function }}
         mvn clean package

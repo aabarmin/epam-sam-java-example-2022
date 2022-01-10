@@ -6,6 +6,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,10 +38,14 @@ class IngestFilterHandlerTest {
 
   private static String getDynamodbEndpoint() {
     final String template = "http://%s:%s";
-    return String.format(template,
+    final String endpoint = String.format(template,
         System.getProperty("DYNAMODB_HOST", "localhost"),
         System.getProperty("DYNAMODB_PORT", "8000")
     );
+
+    System.out.println("DynamoDB connection endpoint: " + endpoint);
+
+    return endpoint;
   }
 
   @BeforeAll
