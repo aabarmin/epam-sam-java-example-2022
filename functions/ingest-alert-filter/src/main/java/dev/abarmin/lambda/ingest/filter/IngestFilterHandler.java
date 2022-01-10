@@ -9,6 +9,7 @@ import java.net.URISyntaxException;
 import java.util.Map;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.GetItemRequest;
@@ -43,6 +44,7 @@ public class IngestFilterHandler implements RequestHandler<Request, Response> {
     if (StringUtils.isNoneEmpty(System.getProperty("ENDPOINT_OVERRIDE"))) {
       final String endpoint = System.getProperty("ENDPOINT_OVERRIDE");
       return DynamoDbClient.builder()
+          .region(Region.AWS_GLOBAL)
           .endpointOverride(new URI(endpoint))
           .build();
     }
