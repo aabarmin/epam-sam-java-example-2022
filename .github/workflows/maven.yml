@@ -8,7 +8,11 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-functions:
+    name: Build Java Lambdas
+    strategy:
+      matrix:
+        function: ['ingest-alerter']
 
     runs-on: ubuntu-latest
 
@@ -21,7 +25,7 @@ jobs:
         distribution: 'adopt'
         cache: maven
         
-    - name: Ingest Alerter
+    - name: Builder Functions
       run: |
-        cd functions/ingest-alerter
+        cd functions/${{ matrix.function }}
         mvn clean package
