@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -54,6 +55,7 @@ class IngestFilterHandlerTest {
   void setUp() throws Exception {
     testClient = DynamoDbClient.builder()
         .endpointOverride(new URI(DYNAMODB_ENDPOINT))
+        .region(Region.AWS_GLOBAL)
         .build();
 
     final Optional<String> tableExists = testClient.listTables().tableNames()
