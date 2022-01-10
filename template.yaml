@@ -69,9 +69,12 @@ Resources:
   IngestAlertFilter:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: functions/ingest_alert_filter/
-      Handler: app.lambda_handler
-      Runtime: python3.8
+      CodeUri: functions/ingest-alert-filter/
+      Handler: dev.abarmin.lambda.ingest.filter.IngestFilterHandler::handleRequest
+      Runtime: java11
+      Architectures:
+        - x86_64
+      MemorySize: 512
       Environment:
         Variables:
           INGEST_DYNAMODB_TABLE_NAME: !Ref EurlexDocumentsTable

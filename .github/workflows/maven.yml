@@ -10,9 +10,15 @@ on:
 jobs:
   build-functions:
     name: Build Java Lambdas
+
     strategy:
       matrix:
-        function: ['ingest-alerter']
+        function: ['ingest-alerter', 'ingest-alert-filter']
+
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local
+        ports: 8000:8000
 
     runs-on: ubuntu-latest
 
@@ -29,3 +35,6 @@ jobs:
       run: |
         cd functions/${{ matrix.function }}
         mvn clean package
+      env:
+        DYNAMODB_HOST: dynamodb
+        DYNAMODB_PORT: 8000
