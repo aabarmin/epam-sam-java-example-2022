@@ -10,6 +10,8 @@ import java.util.Map;
 import lombok.SneakyThrows;
 import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
+import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -47,7 +49,10 @@ public class IngestFilterHandler implements RequestHandler<Request, Response> {
       return DynamoDbClient.builder()
           .region(Region.AWS_GLOBAL)
           .endpointOverride(new URI(endpoint))
-          .credentialsProvider(AnonymousCredentialsProvider.create())
+          .credentialsProvider(StaticCredentialsProvider.create(AwsBasicCredentials.create(
+              "fakeAccessKeyId",
+              "fakeSecretAccessKeyId"
+          )))
           .build();
     }
 
