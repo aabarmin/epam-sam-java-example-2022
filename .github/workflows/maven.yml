@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        function: ['ingest-alerter', 'ingest-alert-filter']
+        function: ['ingest-alerter', 'ingest-alert-filter', 'ingest-metadata-downloader']
 
     services:
       dynamodb:
