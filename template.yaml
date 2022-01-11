@@ -5,6 +5,14 @@ Description: >
 
   State Machine to download Notice documents from EurLex
 
+Parameters:
+  BucketName:
+    Type: String
+    Default: abarmin-s3-bucket-2022
+  DynameDbTableName:
+    Type: String
+    Default: eurlex_documents
+
 Resources:
   ApplicationRestApi:
     Type: AWS::Serverless::Api
@@ -38,7 +46,7 @@ Resources:
   EurlexDocumentsTable:
     Type: AWS::DynamoDB::Table
     Properties:
-      TableName: eurlex_documents
+      TableName: !Ref DynameDbTableName
       BillingMode: PROVISIONED
       ProvisionedThroughput:
         ReadCapacityUnits: 5
@@ -54,7 +62,7 @@ Resources:
     Type: AWS::S3::Bucket
     DeletionPolicy: Retain
     Properties:
-      BucketName: abarmins3bucket
+      BucketName: !Ref BucketName
 
   IngestAlerter:
     Type: AWS::Serverless::Function
