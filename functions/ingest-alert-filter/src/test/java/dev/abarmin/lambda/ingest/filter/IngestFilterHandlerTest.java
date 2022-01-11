@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfEnvironmentVariable;
 import software.amazon.awssdk.auth.credentials.*;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
@@ -28,6 +29,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author Aleksandr Barmin
  */
+@DisabledIfEnvironmentVariable(named = "GITHUB_JOB", matches = "build-sam")
 class IngestFilterHandlerTest {
   private static final String EURLEX_DOCUMENTS = "eurlex_documents";
   private static final String DYNAMODB_ENDPOINT = getDynamodbEndpoint();
