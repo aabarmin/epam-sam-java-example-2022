@@ -36,8 +36,6 @@ jobs:
     - name: Build Functions
       run: |
         cd functions/${{ matrix.function }}
-        echo "HOST - ${DYNAMODB_HOST}"
-        echo "PORT - ${DYNAMODB_PORT}"
         mvn clean package
       env:
         DYNAMODB_HOST: dynamodb
