@@ -47,6 +47,12 @@ jobs:
     needs:
       - build-functions
 
+    services:
+      dynamodb:
+        image: amazon/dynamodb-local
+        ports:
+          - 8000:8000
+
     steps:
       - uses: actions/checkout@v2
 
@@ -55,5 +61,4 @@ jobs:
 
       - name: Build SAM bundles
         run: |
-          export MAVEN_OPTS="-DskipTests=true"
           sam build --use-container
