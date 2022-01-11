@@ -10,6 +10,8 @@ import org.apache.commons.lang3.StringUtils;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
+import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeDefinition;
@@ -49,14 +51,13 @@ class IngestFilterHandlerTest {
   @BeforeAll
   static void beforeAll() {
     System.setProperty("ENDPOINT_OVERRIDE", DYNAMODB_ENDPOINT);
-    System.setProperty("AWS_ACCESS_KEY_ID", "fakeAccessKeyId");
-    System.setProperty("AWS_SECRET_ACCESS_KEY_ID", "fakeSecreatAccessKeyId");
   }
 
   @BeforeEach
   void setUp() throws Exception {
     testClient = DynamoDbClient.builder()
         .endpointOverride(new URI(DYNAMODB_ENDPOINT))
+        .credentialsProvider(AnonymousCredentialsProvider.create())
         .region(Region.AWS_GLOBAL)
         .build();
 
