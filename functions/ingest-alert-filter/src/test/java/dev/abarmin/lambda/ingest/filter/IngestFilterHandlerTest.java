@@ -51,6 +51,7 @@ class IngestFilterHandlerTest {
 
   @BeforeAll
   static void beforeAll() {
+    System.out.println("ENV GITHUB_JOB=" + System.getProperty("GITHUB_JOB"));
     System.setProperty("ENDPOINT_OVERRIDE", DYNAMODB_ENDPOINT);
   }
 
