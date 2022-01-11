@@ -49,6 +49,8 @@ class IngestFilterHandlerTest {
   @BeforeAll
   static void beforeAll() {
     System.setProperty("ENDPOINT_OVERRIDE", DYNAMODB_ENDPOINT);
+    System.setProperty("AWS_ACCESS_KEY_ID", "fakeAccessKeyId");
+    System.setProperty("AWS_SECRET_ACCESS_KEY_ID", "fakeSecreatAccessKeyId");
   }
 
   @BeforeEach
