@@ -70,6 +70,7 @@ Resources:
       CodeUri: functions/ingest-alerter/
       Handler: dev.abarmin.lambda.ingest.alerter.IngestAlerterHandler::handleRequest
       Runtime: java11
+      Timeout: 30
       Architectures:
         - x86_64
       MemorySize: 512
@@ -83,6 +84,7 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
+      Timeout: 30
       Environment:
         Variables:
           INGEST_DYNAMODB_TABLE_NAME: !Ref EurlexDocumentsTable
@@ -101,6 +103,7 @@ Resources:
       Architectures:
         - x86_64
       MemorySize: 512
+      Timeout: 30
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref EurlexDocumentsTable
