@@ -44,8 +44,12 @@ jobs:
   build-sam:
     name: Build SAM bundles
     runs-on: ubuntu-latest
+    needs:
+      - build-functions
 
     steps:
+      - uses: actions/checkout@v2
+
       - name: Install SAM
         uses: aws-actions/setup-sam@v1
 
