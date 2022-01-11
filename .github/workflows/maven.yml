@@ -40,3 +40,10 @@ jobs:
       env:
         DYNAMODB_HOST: dynamodb
         DYNAMODB_PORT: 8000
+
+    - name: Install SAM
+      uses: aws-actions/setup-sam@v1
+
+    - name: Build SAM bundles
+      run: |
+        sam build --use-container
