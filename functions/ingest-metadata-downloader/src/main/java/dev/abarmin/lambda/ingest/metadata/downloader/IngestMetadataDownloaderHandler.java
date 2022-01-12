@@ -98,9 +98,17 @@ public class IngestMetadataDownloaderHandler implements RequestHandler<Request, 
         .uri(new URI(downloadUrl))
         .GET()
         .build();
-    final HttpResponse.BodyHandler<Path> bodyHandler = HttpResponse.BodyHandlers.ofFileDownload(getTempDirectory());
+    final HttpResponse.BodyHandler<Path> bodyHandler =
+        HttpResponse.BodyHandlers.ofFile(getFileName(request));
     final HttpResponse<Path> downloadedNotice = httpClient.send(downloadRequest, bodyHandler);
     return downloadedNotice.body();
+  }
+
+  private Path getFileName(Request request) {
+    return getTempDirectory().resolve(String.format(
+        "%s.xml",
+        request.getCellarId()
+    ));
   }
 
   @SneakyThrows
