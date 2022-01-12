@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import dev.abarmin.lambda.ingest.metadata.downloader.model.Request;
 import dev.abarmin.lambda.ingest.metadata.downloader.model.Response;
 import lombok.SneakyThrows;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValueUpdate;
@@ -44,7 +45,10 @@ public class IngestMetadataDownloaderHandler implements RequestHandler<Request, 
   }
 
   private void createRecord(Request request) {
-    final DynamoDbClient dbClient = DynamoDbClient.builder().build();
+    final DynamoDbClient dbClient = DynamoDbClient.builder()
+        .httpClient(ApacheHttpClient.create())
+        .build();
+
     final UpdateItemRequest updateRequest = UpdateItemRequest.builder()
         .tableName(getTableName())
         .key(Map.of(
@@ -73,7 +77,10 @@ public class IngestMetadataDownloaderHandler implements RequestHandler<Request, 
   }
 
   private void uploadNotice(Path downloadPath, Request request) {
-    final S3Client s3Client = S3Client.builder().build();
+    final S3Client s3Client = S3Client.builder()
+        .httpClient(ApacheHttpClient.create())
+        .build();
+
     final PutObjectRequest putRequest = PutObjectRequest.builder()
         .bucket(getBucketName())
         .key(String.format(

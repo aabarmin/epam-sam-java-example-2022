@@ -12,6 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import software.amazon.awssdk.auth.credentials.AnonymousCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
+import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -56,7 +57,10 @@ public class IngestFilterHandler implements RequestHandler<Request, Response> {
           .build();
     }
 
-    return DynamoDbClient.create();
+    return DynamoDbClient
+        .builder()
+        .httpClient(ApacheHttpClient.create())
+        .build();
   }
 
   private AttributeValue getStringValue(Request input) {
