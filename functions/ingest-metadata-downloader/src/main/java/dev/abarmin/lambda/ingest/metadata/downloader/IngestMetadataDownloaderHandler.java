@@ -102,12 +102,21 @@ public class IngestMetadataDownloaderHandler implements RequestHandler<Request, 
     final String downloadUrl = DOWNLOAD_URL_TEMPLATE.replace("${cellar_id}", request.getCellarId());
     final HttpRequest downloadRequest = HttpRequest.newBuilder()
         .uri(new URI(downloadUrl))
+        .header("Accept", "*/*")
         .GET()
         .build();
     final HttpResponse.BodyHandler<Path> bodyHandler =
         HttpResponse.BodyHandlers.ofFile(getFileName(request));
-    final HttpResponse<Path> downloadedNotice = httpClient.send(downloadRequest, bodyHandler);
-    return downloadedNotice.body();
+    final HttpResponse<Path> downloadResponse = httpClient.send(downloadRequest, bodyHandler);
+    if (downloadResponse.statusCode() == 200) {
+      final Path downloadedNoticePath = downloadResponse.body();
+
+      log.info("Notice downloaded to {}", downloadedNoticePath);
+      log.info("Notice size is {}", downloadedNoticePath.toFile().length());
+
+      return downloadedNoticePath;
+    }
+    throw new RuntimeException("Can't download notice");
   }
 
   private Path getFileName(Request request) {
