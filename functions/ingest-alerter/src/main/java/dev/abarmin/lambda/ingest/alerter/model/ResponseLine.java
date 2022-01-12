@@ -1,6 +1,5 @@
 package dev.abarmin.lambda.ingest.alerter.model;
 
-import java.util.Collection;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -9,6 +8,6 @@ import lombok.RequiredArgsConstructor;
  */
 @Data
 @RequiredArgsConstructor
-public class Response {
-  private final Collection<ResponseLine> items;
+public class ResponseLine {
+  private final String cellarId;
 }

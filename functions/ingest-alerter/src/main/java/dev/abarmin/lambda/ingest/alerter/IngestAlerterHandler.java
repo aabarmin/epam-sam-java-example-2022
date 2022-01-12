@@ -27,14 +27,14 @@ import org.xml.sax.InputSource;
 /**
  * @author Aleksandr Barmin
  */
-public class IngestAlerterHandler implements RequestHandler<Request, Collection<Response>> {
+public class IngestAlerterHandler implements RequestHandler<Request, Response> {
   private static final HttpClient HTTP_CLIENT = HttpClient.newHttpClient();
   private static final XPathFactory XPATH_FACTORY = XPathFactory.newInstance();
   private static final DocumentBuilderFactory BUILDER_FACTORY = DocumentBuilderFactory.newInstance();
 
   @Override
   @SneakyThrows
-  public Collection<Response> handleRequest(Request input, Context context) {
+  public Response handleRequest(Request input, Context context) {
     final IngestAlerter alerter = new IngestAlerter(
         HTTP_CLIENT,
         BUILDER_FACTORY.newDocumentBuilder(),

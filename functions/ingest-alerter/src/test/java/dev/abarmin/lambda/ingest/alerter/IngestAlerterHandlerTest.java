@@ -24,7 +24,7 @@ class IngestAlerterHandlerTest {
     request.setStartDate("2020-10-20");
     request.setEndDate("2020-10-21");
 
-    final Collection<Response> response = uut.handleRequest(request, null);
+    final Response response = uut.handleRequest(request, null);
 
     assertThat(response)
         .isNotNull();

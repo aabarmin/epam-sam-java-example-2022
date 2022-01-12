@@ -2,12 +2,14 @@ package dev.abarmin.lambda.ingest.alerter;
 
 import dev.abarmin.lambda.ingest.alerter.model.Request;
 import dev.abarmin.lambda.ingest.alerter.model.Response;
+import dev.abarmin.lambda.ingest.alerter.model.ResponseLine;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
+import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -38,7 +40,7 @@ public class IngestAlerter {
   private final XPathExpression extractExpression;
 
   @SneakyThrows
-  public Collection<Response> process(final Request input) {
+  public Response process(final Request input) {
     final HttpRequest request = HttpRequest.newBuilder(buildUri(input))
         .header("Accept-Language", "en_EN")
         .header("Accept", "*/*")
@@ -51,16 +53,18 @@ public class IngestAlerter {
     return processResponse(responseBody);
   }
 
-  private Collection<Response> processResponse(final byte[] response) throws Exception {
+  private Response processResponse(final byte[] response) throws Exception {
     final Document document = documentBuilder.parse(new InputSource(new ByteArrayInputStream(response)));
     final NodeList cellarNodes = (NodeList) extractExpression.evaluate(document, XPathConstants.NODESET);
 
-    return IntStream.range(0, cellarNodes.getLength())
+    final List<ResponseLine> lines = IntStream.range(0, cellarNodes.getLength())
         .mapToObj(index -> cellarNodes.item(index))
         .map(Node::getTextContent)
         .map(content -> StringUtils.substringAfter(content, "cellar:"))
-        .map(Response::new)
+        .map(ResponseLine::new)
         .collect(Collectors.toList());
+
+    return new Response(lines);
   }
 
   @SneakyThrows
