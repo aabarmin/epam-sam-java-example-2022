@@ -5,6 +5,7 @@ import com.amazonaws.services.lambda.runtime.RequestHandler;
 import dev.abarmin.lambda.ingest.metadata.downloader.model.Request;
 import dev.abarmin.lambda.ingest.metadata.downloader.model.Response;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.http.apache.ApacheHttpClient;
 import software.amazon.awssdk.services.dynamodb.DynamoDbClient;
 import software.amazon.awssdk.services.dynamodb.model.AttributeValue;
@@ -28,6 +29,7 @@ import java.util.Map;
 /**
  * @author Aleksandr Barmin
  */
+@Slf4j
 public class IngestMetadataDownloaderHandler implements RequestHandler<Request, Response> {
   private static final String DOWNLOAD_URL_TEMPLATE =
       "https://eur-lex.europa.eu/download-notice.html?legalContentId=cellar:${cellar_id}&noticeType=branch&callingUrl=&lng=EN";
@@ -69,11 +71,11 @@ public class IngestMetadataDownloaderHandler implements RequestHandler<Request, 
   }
 
   private String getTableName() {
-    return System.getProperty("INGEST_DYNAMODB_TABLE_NAME");
+    return System.getenv("INGEST_DYNAMODB_TABLE_NAME");
   }
 
   private String getBucketName() {
-    return System.getProperty("INGEST_S3_BUCKET_NAME");
+    return System.getenv("INGEST_S3_BUCKET_NAME");
   }
 
   private void uploadNotice(Path downloadPath, Request request) {
@@ -81,12 +83,16 @@ public class IngestMetadataDownloaderHandler implements RequestHandler<Request, 
         .httpClient(ApacheHttpClient.create())
         .build();
 
+    final String objectKey = String.format(
+        "notice_%s.xml", request.getCellarId()
+    );
     final PutObjectRequest putRequest = PutObjectRequest.builder()
         .bucket(getBucketName())
-        .key(String.format(
-            "notice_%s.xml", request.getCellarId()
-        ))
+        .key(objectKey)
         .build();
+
+    log.info("Uploading to bucket {}", getBucketName());
+    log.info("Object key is {}", objectKey);
 
     final PutObjectResponse putResponse = s3Client.putObject(putRequest, downloadPath);
   }

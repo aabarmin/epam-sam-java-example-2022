@@ -111,6 +111,10 @@ Resources:
             TableName: !Ref EurlexDocumentsTable
         - S3CrudPolicy:
             BucketName: !Ref NoticesS3Bucket
+      Environment:
+        Variables:
+          INGEST_DYNAMODB_TABLE_NAME: !Ref EurlexDocumentsTable
+          INGEST_S3_BUCKET_NAME: !Ref NoticesS3Bucket
     DependsOn:
       - EurlexDocumentsTable
       - NoticesS3Bucket

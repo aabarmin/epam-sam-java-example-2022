@@ -68,6 +68,6 @@ public class IngestFilterHandler implements RequestHandler<Request, Response> {
   }
 
   private String getTableName() {
-    return System.getProperty("INGEST_DYNAMODB_TABLE_NAME", "eurlex_documents");
+    return System.getenv("INGEST_DYNAMODB_TABLE_NAME");
   }
 }
