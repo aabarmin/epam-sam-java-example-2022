@@ -17,6 +17,7 @@ import javax.xml.xpath.XPathConstants;
 import javax.xml.xpath.XPathExpression;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Node;
@@ -26,6 +27,7 @@ import org.xml.sax.InputSource;
 /**
  * @author Aleksandr Barmin
  */
+@Slf4j
 @RequiredArgsConstructor
 public class IngestAlerter {
   private static final String URI_TEMPLATE =
@@ -41,13 +43,25 @@ public class IngestAlerter {
 
   @SneakyThrows
   public Response process(final Request input) {
-    final HttpRequest request = HttpRequest.newBuilder(buildUri(input))
+    final URI buildUri = buildUri(input);
+    log.debug("Sending request to {}", buildUri);
+
+    final HttpRequest request = HttpRequest.newBuilder(buildUri)
         .header("Accept-Language", "en_EN")
         .header("Accept", "*/*")
         .GET()
         .build();
 
     final HttpResponse<byte[]> response = httpClient.send(request, HttpResponse.BodyHandlers.ofByteArray());
+    log.debug("Response status is {}", response.statusCode());
+
+    if (response.statusCode() != 200) {
+      throw new RuntimeException(String.format(
+          "Did not manage to get alerts, error message %s",
+          response.body()
+      ));
+    }
+
     final byte[] responseBody = response.body();
 
     return processResponse(responseBody);

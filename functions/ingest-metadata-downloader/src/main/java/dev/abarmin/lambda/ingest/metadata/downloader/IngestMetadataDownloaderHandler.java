@@ -116,7 +116,10 @@ public class IngestMetadataDownloaderHandler implements RequestHandler<Request, 
 
       return downloadedNoticePath;
     }
-    throw new RuntimeException("Can't download notice");
+    throw new RuntimeException(String.format(
+        "Can't download notice due to the error, %s",
+        Files.readAllBytes(downloadResponse.body())
+    ));
   }
 
   private Path getFileName(Request request) {
