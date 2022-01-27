@@ -10,6 +10,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import javax.xml.parsers.DocumentBuilder;
@@ -31,7 +32,7 @@ import org.xml.sax.InputSource;
 @RequiredArgsConstructor
 public class IngestAlerter {
   private static final String URI_TEMPLATE =
-      "https://publications.europa.eu/webapi/notification/ingestion?" +
+      "${eurlex.endpoint}/webapi/notification/ingestion?" +
       "startDate=${startDate}&" +
       "endDate=${endDate}&" +
       "type=CREATE&" +
@@ -85,8 +86,13 @@ public class IngestAlerter {
   private URI buildUri(Request input) {
     final String uri = URI_TEMPLATE
         .replace("${startDate}", input.getStartDate())
-        .replace("${endDate}", input.getEndDate());
+        .replace("${endDate}", input.getEndDate())
+        .replace("${eurlex.endpoint}", getEurlexEndpoint());
 
     return new URI(uri);
+  }
+
+  private String getEurlexEndpoint() {
+    return System.getProperty("EURLEX_ENDPOINT", "https://publications.europa.eu");
   }
 }
